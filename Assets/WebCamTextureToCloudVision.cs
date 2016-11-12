@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.UI;
+
 public class WebCamTextureToCloudVision : MonoBehaviour {
 
 	public string url = "https://vision.googleapis.com/v1/images:annotate?key=";
@@ -12,7 +12,6 @@ public class WebCamTextureToCloudVision : MonoBehaviour {
 	public FeatureType featureType = FeatureType.FACE_DETECTION;
 	public int maxResults = 10;
 
-    public Text debug; 
 	WebCamTexture webcamTexture;
 	Texture2D texture2D;
 	Dictionary<string, string> headers;
@@ -55,6 +54,14 @@ public class WebCamTextureToCloudVision : MonoBehaviour {
 	public class AnnotateImageResponses {
 		public List<AnnotateImageResponse> responses;
 	}
+    [System.Serializable]
+    public class Item
+    {
+        public int id;
+        public string name;
+        public string description;
+    }
+
 
 	[System.Serializable]
 	public class AnnotateImageResponse {
@@ -273,10 +280,30 @@ public class WebCamTextureToCloudVision : MonoBehaviour {
 					yield return www;
 					if (www.error == null) {
 						Debug.Log(www.text.Replace("\n", "").Replace(" ", ""));
-						//AnnotateImageResponses responses = JsonUtility.FromJson<AnnotateImageResponses>(www.text);
+						AnnotateImageResponses responses = JsonUtility.FromJson<AnnotateImageResponses>(www.text);
 						// SendMessage, BroadcastMessage or someting like that.
-						//Sample_OnAnnotateImageResponses(responses);
-                        debug.text = www.text;
+                        if (responses.responses.Count > 0)
+                        {
+
+                            for (var i = 0; i < responses.responses.Count; i++)
+                            {
+
+                                if (responses.responses[i].labelAnnotations != null && responses.responses[i].labelAnnotations.Count > 0)
+                                {
+
+                                    for (var j = 0; j < responses.responses[i].labelAnnotations.Count; j++)
+                                    {
+
+                                        Debug.Log(responses.responses[i].labelAnnotations[j].description);
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+                        Sample_OnAnnotateImageResponses(responses);
 					} else {
 						Debug.Log("Error: " + www.error);
 					}
