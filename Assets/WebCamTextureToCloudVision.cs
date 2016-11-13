@@ -212,15 +212,19 @@ public class WebCamTextureToCloudVision : MonoBehaviour {
 			Debug.LogError("No API key. Please set your API key into the \"Web Cam Texture To Cloud Vision(Script)\" component.");
 		
 		WebCamDevice[] devices = WebCamTexture.devices;
-		for (var i = 0; i < devices.Length; i++) {
+		for (var i = 0; i < devices.Length; i++) 
+        {
 			Debug.Log (devices [i].name);
 		}
-		if (devices.Length > 0) {
+		if (devices.Length > 0) 
+        {
 			webcamTexture = new WebCamTexture(devices[0].name, requestedWidth, requestedHeight);
 			Renderer r = GetComponent<Renderer> ();
-			if (r != null) {
+			if (r != null) 
+            {
 				Material m = r.material;
-				if (m != null) {
+				if (m != null) 
+                {
 					m.mainTexture = webcamTexture;
 				}
 			}
@@ -244,7 +248,8 @@ public class WebCamTextureToCloudVision : MonoBehaviour {
 			Color[] pixels = webcamTexture.GetPixels();
 			if (pixels.Length == 0)
 				yield return null;
-			if (texture2D == null || webcamTexture.width != texture2D.width || webcamTexture.height != texture2D.height) {
+			if (texture2D == null || webcamTexture.width != texture2D.width || webcamTexture.height != texture2D.height) 
+            {
 				texture2D = new Texture2D(webcamTexture.width, webcamTexture.height, TextureFormat.RGBA32, false);
 			}
 
@@ -273,38 +278,36 @@ public class WebCamTextureToCloudVision : MonoBehaviour {
 			requests.requests.Add(request);
 
 			string jsonData = JsonUtility.ToJson(requests, false);
-			if (jsonData != string.Empty) {
+			if (jsonData != string.Empty) 
+            {
 				string url = this.url + this.apiKey;
 				byte[] postData = System.Text.Encoding.Default.GetBytes(jsonData);
-				using(WWW www = new WWW(url, postData, headers)) {
+				using(WWW www = new WWW(url, postData, headers)) 
+                {
 					yield return www;
-					if (www.error == null) {
+					if (www.error == null) 
+                    {
 						Debug.Log(www.text.Replace("\n", "").Replace(" ", ""));
 						AnnotateImageResponses responses = JsonUtility.FromJson<AnnotateImageResponses>(www.text);
 						// SendMessage, BroadcastMessage or someting like that.
                         if (responses.responses.Count > 0)
                         {
-
                             for (var i = 0; i < responses.responses.Count; i++)
                             {
-
                                 if (responses.responses[i].labelAnnotations != null && responses.responses[i].labelAnnotations.Count > 0)
                                 {
-
                                     for (var j = 0; j < responses.responses[i].labelAnnotations.Count; j++)
                                     {
-
+                                        if (responses.responses[i].labelAnnotations[j].score>0.5)
                                         Debug.Log(responses.responses[i].labelAnnotations[j].description);
-
                                     }
-
                                 }
-
                             }
-
                         }
                         Sample_OnAnnotateImageResponses(responses);
-					} else {
+					} 
+                    else 
+                    {
 						Debug.Log("Error: " + www.error);
 					}
 				}
@@ -329,8 +332,10 @@ public class WebCamTextureToCloudVision : MonoBehaviour {
 	/// A sample implementation.
 	/// </summary>
 	void Sample_OnAnnotateImageResponses(AnnotateImageResponses responses) {
-		if (responses.responses.Count > 0) {
-			if (responses.responses[0].faceAnnotations != null && responses.responses[0].faceAnnotations.Count > 0) {
+		if (responses.responses.Count > 0) 
+        {
+			if (responses.responses[0].faceAnnotations != null && responses.responses[0].faceAnnotations.Count > 0) 
+            {
 				Debug.Log("joyLikelihood: " + responses.responses[0].faceAnnotations[0].joyLikelihood);
 			}
 		}
